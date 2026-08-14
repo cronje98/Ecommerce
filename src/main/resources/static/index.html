@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Shiro Ecommerce - Login</title>
+</head>
+
+<body>
+
+<h1>Shiro Ecommerce</h1>
+
+<h2>Login</h2>
+
+<form id="loginForm">
+
+    <label for="login">Username or Email:</label>
+    <br>
+
+    <input
+            type="text"
+            id="login"
+            name="login"
+            required
+    >
+
+    <br><br>
+
+    <label for="password">Password:</label>
+    <br>
+
+    <input
+            type="password"
+            id="password"
+            name="password"
+            required
+    >
+
+    <br><br>
+
+    <button type="submit">Login</button>
+
+</form>
+
+<p id="message"></p>
+
+
+<script>
+
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+
+        // Prevent the page from refreshing
+        event.preventDefault();
+
+        // Get values from the form
+        const login = document.getElementById("login").value;
+        const password = document.getElementById("password").value;
+
+
+        // Send username/email and password to Java
+        fetch("/login", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                login: login,
+                password: password
+            })
+
+        })
+
+
+            // Convert Java's response into JavaScript data
+            .then(response => response.json())
+
+
+            // Check whether login was successful
+            .then(data => {
+
+                const message = document.getElementById("message");
+
+
+                if (data === true) {
+
+                    message.textContent = "Login successful!";
+
+                    // Send user to your home page
+                    window.location.href = "/home.html";
+
+                }
+                else {
+
+                    message.textContent =
+                        "Invalid username/email or password.";
+
+                }
+
+            })
+
+
+            // Handle errors
+            .catch(error => {
+
+                console.error(error);
+
+                document.getElementById("message").textContent =
+                    "Something went wrong.";
+
+            });
+
+    });
+
+</script>
+
+</body>
+
+</html>

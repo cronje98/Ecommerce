@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ecommerce Store</title>
+</head>
+
+<body>
+
+<h1>PRODUCTS</h1>
+
+<div id="products"></div>
+
+<script>
+
+    fetch('/products')
+        .then(response => response.json())
+        .then(products => {
+
+            const productsDiv = document.getElementById('products');
+
+            products.forEach(product => {
+
+                const productElement = document.createElement('div');
+
+                productElement.innerHTML = `
+                        <h2>
+                            <a href="/product.html?id=${product.id}">
+                                ${product.name}
+                            </a>
+                        </h2>
+                    `;
+
+                productsDiv.appendChild(productElement);
+            });
+        });
+
+</script>
+
+</body>
+</html>
