@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart</title>
+</head>
+
+<body>
+
+<h1>Your Cart</h1>
+
+<div id="cart">
+    Loading cart...
+</div>
+
+<h2 id="total"></h2>
+
+<button id="backButton">← Back</button>
+
+<script>
+
+    // Get the current user's ID
+    const userId = sessionStorage.getItem("userId");
+
+    const cartDiv = document.getElementById("cart");
+    const totalDiv = document.getElementById("total");
+
+
+    // Check that a user is logged in
+    if (!userId) {
+
+        cartDiv.textContent = "You are not logged in.";
+
+    } else {
+
+        // Get this user's cart
+        fetch("/cart/" + userId)
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Could not load cart");
+                }
+
+                return response.json();
+
+            })
+
+            .then(cart => {
+
+                // Empty cart
+                if (cart.length === 0) {
+
+                    cartDiv.textContent = "Your cart is empty.";
+                    totalDiv.textContent = "";
+
+                    return;
+                }
+
+
+                // Clear "Loading cart..."
+                cartDiv.innerHTML = "";
+
+
+                let total = 0;
+
+
+                // Display each cart item
+                cart.forEach(item => {
+
+                    const cartItem = document.createElement("div");
+
+                    cartItem.innerHTML = `
+                        <h2>${item.productName}</h2>
+
+                        <p>
+                            Price: $${item.price.toFixed(2)}
+                        </p>
+
+                        <p>
+                            Quantity: ${item.quantity}
+                        </p>
+
+                        <p>
+                            Subtotal: $${item.subtotal.toFixed(2)}
+                        </p>
+
+                        <hr>
+                    `;
+
+                    cartDiv.appendChild(cartItem);
+
+
+                    // Add this item's subtotal to total
+                    total += item.subtotal;
+
+                });
+
+
+                // Display total
+                totalDiv.textContent =
+                    "Total: $" + total.toFixed(2);
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                cartDiv.textContent =
+                    "Could not load cart.";
+
+            });
+
+    }
+
+
+    // Back button
+    document.getElementById("backButton")
+        .addEventListener("click", function() {
+
+            window.history.back();
+
+        });
+
+</script>
+
+</body>
+</html>
