@@ -1,37 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ecommerce Store</title>
+    <title>Ecommerce Store Home Page</title>
 </head>
 
 <body>
 
-<h1>PRODUCTS</h1>
+<div>
+    <a href="#" id="cartLink">🛒 Cart</a>
+</div>
 
-<div id="products"></div>
+<h1> HOME </h1>
+
+<div id="products">Loading products...</div>
 
 <script>
 
-    fetch('/products')
-        .then(response => response.json())
+    // --------------------------------
+    // Get username from the URL
+    // Example: /john/home
+    // --------------------------------
+
+    const pathParts = window.location.pathname.split("/");
+    const username = pathParts[1];
+
+    console.log("Username:", username);
+
+
+    // --------------------------------
+    // Create Cart link
+    // --------------------------------
+
+    document.getElementById("cartLink").href =
+        "/" + username + "/cart";
+    /*document.getElementById("cartLink").href =
+        "/cart.html";*/
+
+
+    // --------------------------------
+    // Get products
+    // --------------------------------
+
+    fetch("/products")
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Could not get products");
+            }
+
+            return response.json();
+
+        })
+
         .then(products => {
 
-            const productsDiv = document.getElementById('products');
+            console.log("Products:", products);
+
+            const productsDiv =
+                document.getElementById("products");
+
+            // Remove "Loading products..."
+            productsDiv.innerHTML = "";
+
 
             products.forEach(product => {
 
-                const productElement = document.createElement('div');
+                const productElement =
+                    document.createElement("div");
 
                 productElement.innerHTML = `
-                        <h2>
-                            <a href="/product.html?id=${product.id}">
-                                ${product.name}
-                            </a>
-                        </h2>
-                    `;
+                    <h2>
+                        <a href="/product.html?id=${product.id}">
+                            ${product.name}
+                        </a>
+                    </h2>
+                `;
 
                 productsDiv.appendChild(productElement);
+
             });
+
+        })
+
+        .catch(error => {
+
+            console.error("Product error:", error);
+
+            document.getElementById("products").textContent =
+                "Could not load products.";
+
         });
 
 </script>
