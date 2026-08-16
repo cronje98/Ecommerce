@@ -5,18 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="cart")
-@Setter
+@Table(name = "cart")
 @Getter
-public class Cart
-{
+@Setter
+public class Cart {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long userId;
-    private String productName;
-    private double Price;
-    private int Quantity;
 
+    private Long productId;
 
+    private int quantity;
 }

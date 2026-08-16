@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,16 +7,21 @@
 
 <body>
 
-<a href="/home.html">← Back to products</a>
+<a href="#" id="backToHome">← Back to products</a>
+<br>
+<a href="/cart.html">Cart</a>
 
 <h1 id="name"></h1>
 <h2 id="price"></h2>
 
 <script>
 
+    // Get product ID from the URL
     const params = new URLSearchParams(window.location.search);
     const productId = params.get("id");
 
+
+    // Get the product from the database
     fetch(`/products/${productId}`)
         .then(response => response.json())
         .then(product => {
@@ -25,9 +31,23 @@
 
             document.getElementById("price").textContent =
                 "$" + product.price;
+
         });
+
+
+    // Back to the logged-in user's home page
+    document.getElementById("backToHome").addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        const username = sessionStorage.getItem("username");
+
+        window.location.href = "/" + username + "/home";
+
+    });
 
 </script>
 
 </body>
 </html>
+```

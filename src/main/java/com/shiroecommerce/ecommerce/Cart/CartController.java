@@ -14,9 +14,9 @@ public class CartController
         this.cartService=cartService;
     }
 
-    @GetMapping("/cart")
-    public List<Cart> getCart(){
-        return cartService.getCart();
+    @GetMapping("/cart/{userId}")
+    public List<CartResponse> getCart(@PathVariable Long userId) {
+        return cartService.getCart(userId);
     }
 
 

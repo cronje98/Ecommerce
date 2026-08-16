@@ -43,6 +43,10 @@
     <button type="submit">Login</button>
 
 </form>
+<p>
+    Don't have an account?
+    <a href="/register.html">Register here</a>
+</p>
 
 <p id="message"></p>
 
@@ -86,13 +90,14 @@
                 const message = document.getElementById("message");
 
 
-                if (data === true) {
+                if (data && data.username) {
+
+                    sessionStorage.setItem("userId", data.id);
+                    sessionStorage.setItem("username", data.username);
 
                     message.textContent = "Login successful!";
 
-                    // Send user to your home page
-                    window.location.href = "/home.html";
-
+                    window.location.href = "/" + data.username + "/home";
                 }
                 else {
 
