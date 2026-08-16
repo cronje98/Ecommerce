@@ -1,8 +1,10 @@
 package com.shiroecommerce.ecommerce.Cart;
+
 import java.util.ArrayList;
 import com.shiroecommerce.ecommerce.Product.Product;
 import com.shiroecommerce.ecommerce.Product.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -20,27 +22,6 @@ public class CartService {
         this.productRepository = productRepository;
     }
 
-    /*public List<Cart> getCart(Long userId) {
-
-        List<Cart> cartItems = cartRepository.findByUserId(userId);
-
-        for (Cart cart : cartItems) {
-
-            Product product =
-                    productRepository
-                            .findById(cart.getProductId())
-                            .orElse(null);
-
-            if (product != null) {
-
-                System.out.println("Product: " + product.getName());
-                System.out.println("Price: " + product.getPrice());
-                System.out.println("Quantity: " + cart.getQuantity());
-
-            }
-        }
-
-        return cartItems;*/
 
     public List<CartResponse> getCart(Long userId)
     {
@@ -57,11 +38,14 @@ public class CartService {
 
             if (product != null) {
 
-                CartResponse response = new CartResponse(
+                CartResponse response = new CartResponse
+                        (
+                        cart.getId(),
                         product.getId(),
                         product.getName(),
                         product.getPrice(),
                         cart.getQuantity()
+
                 );
 
                 responses.add(response);
@@ -70,5 +54,50 @@ public class CartService {
 
         return responses;
     }
+
+    public Cart addToCart(Cart cart) {
+
+        // Check that the product exists
+        Product product = productRepository
+                .findById(cart.getProductId())
+                .orElseThrow();
+
+        // Check if the product is already in this user's cart
+        Cart existingCart = cartRepository
+                .findByUserIdAndProductId(
+                        cart.getUserId(),
+                        cart.getProductId()
+                )
+                .orElse(null);
+
+        if (existingCart != null) {
+
+            // Product already exists in cart,
+            // so increase the quantity
+            existingCart.setQuantity(
+                    existingCart.getQuantity() + cart.getQuantity()
+            );
+
+            return cartRepository.save(existingCart);
+        }
+
+        return cartRepository.save(cart);
+    }
+    public void removeFromCart(Long cartId) {
+        cartRepository.deleteById(cartId);
+    }
+
+    public Cart updateQuantity(Long cartId, int quantity) {
+
+        Cart cart = cartRepository
+                .findById(cartId)
+                .orElseThrow();
+
+        cart.setQuantity(quantity);
+
+        return cartRepository.save(cart);
+    }
+
+
 
 }

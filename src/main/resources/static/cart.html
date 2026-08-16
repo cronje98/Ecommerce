@@ -5,8 +5,11 @@
 </head>
 
 <body>
-
+<button id="backButton">Back</button>
+<br>
 <h1>Your Cart</h1>
+
+
 
 <div id="cart">
     Loading cart...
@@ -14,7 +17,7 @@
 
 <h2 id="total"></h2>
 
-<button id="backButton">← Back</button>
+
 
 <script>
 
@@ -60,7 +63,6 @@
                 // Clear "Loading cart..."
                 cartDiv.innerHTML = "";
 
-
                 let total = 0;
 
 
@@ -76,18 +78,95 @@
                             Price: $${item.price.toFixed(2)}
                         </p>
 
-                        <p>
-                            Quantity: ${item.quantity}
-                        </p>
+                        <div>
+                            <button type="button" class="decreaseButton">
+                                −
+                            </button>
+
+                            <span class="quantity">
+                                ${item.quantity}
+                            </span>
+
+                            <button type="button" class="increaseButton">
+                                +
+                            </button>
+                        </div>
 
                         <p>
                             Subtotal: $${item.subtotal.toFixed(2)}
                         </p>
 
+                        <button type="button" class="removeButton">
+                            Remove
+                        </button>
+
                         <hr>
                     `;
 
                     cartDiv.appendChild(cartItem);
+
+
+                    // Quantity buttons
+                    const decreaseButton =
+                        cartItem.querySelector(".decreaseButton");
+
+                    const increaseButton =
+                        cartItem.querySelector(".increaseButton");
+
+                    let quantity = item.quantity;
+
+
+                    // Increase quantity
+                    increaseButton.addEventListener("click", function() {
+
+                        quantity++;
+
+                        updateQuantity(item.cartId, quantity);
+
+                    });
+
+
+                    // Decrease quantity
+                    decreaseButton.addEventListener("click", function() {
+
+                        if (quantity > 1) {
+
+                            quantity--;
+
+                            updateQuantity(item.cartId, quantity);
+
+                        }
+
+                    });
+
+
+                    // Remove item
+                    const removeButton =
+                        cartItem.querySelector(".removeButton");
+
+                    removeButton.addEventListener("click", function() {
+
+                        fetch(`/cart/${item.cartId}`, {
+                            method: "DELETE"
+                        })
+                            .then(response => {
+
+                                if (!response.ok) {
+                                    throw new Error("Could not remove item");
+                                }
+
+                                window.location.reload();
+
+                            })
+                            .catch(error => {
+
+                                console.error(error);
+
+                                alert("Could not remove item.");
+
+                            });
+
+                    });
 
 
                     // Add this item's subtotal to total
@@ -114,6 +193,37 @@
     }
 
 
+    // Update quantity in database
+    function updateQuantity(cartId, quantity) {
+
+        fetch(`/cart/${cartId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(quantity)
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Could not update quantity");
+                }
+
+                // Reload cart so subtotal and total update
+                window.location.reload();
+
+            })
+            .catch(error => {
+
+                console.error(error);
+
+                alert("Could not update quantity.");
+
+            });
+
+    }
+
+
     // Back button
     document.getElementById("backButton")
         .addEventListener("click", function() {
@@ -126,3 +236,4 @@
 
 </body>
 </html>
+

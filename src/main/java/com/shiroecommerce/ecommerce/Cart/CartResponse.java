@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CartResponse {
 
+    private Long cartId;
     private Long productId;
     private String productName;
     private double price;
@@ -14,11 +15,13 @@ public class CartResponse {
     private double subtotal;
 
     public CartResponse(
+            Long cartId,
             Long productId,
             String productName,
             double price,
             int quantity
     ) {
+        this.cartId = cartId;
         this.productId = productId;
         this.productName = productName;
         this.price = price;

@@ -2,23 +2,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Product</title>
+    <title>Product Information</title>
 </head>
 
 <body>
 
-<a href="#" id="backToHome">← Back to products</a>
+
+<button id="backToHome">Back to products </button>
 <br>
-<a href="/cart.html">Cart</a>
+
+<a href="#" id="cartLink">🛒 Cart</a>
 
 <h1 id="name"></h1>
 <h2 id="price"></h2>
 
-<script>
+<!-- Quantity -->
+<div class="quantity-container">
 
-    // Get product ID from the URL
+    <button type="button" id="decreaseQuantity">−</button>
+
+    <input
+            type="number"
+            id="quantity"
+            value="1"
+            min="1"
+    >
+
+    <button type="button" id="increaseQuantity">+</button>
+
+</div>
+
+<!-- Add to cart -->
+<button type="button" id="addToCart">
+    Add to Cart
+</button>
+
+<p id="message"></p>
+
+<script>
+    // Get product ID from URL
     const params = new URLSearchParams(window.location.search);
-    const productId = params.get("id");
+    //const productId = params.get("id");
+    const productId = Number(params.get("id"));
 
 
     // Get the product from the database
@@ -35,16 +60,108 @@
         });
 
 
-    // Back to the logged-in user's home page
-    document.getElementById("backToHome").addEventListener("click", function(event) {
+    // Quantity elements
+    const quantityInput =
+        document.getElementById("quantity");
 
-        event.preventDefault();
+    const decreaseButton =
+        document.getElementById("decreaseQuantity");
 
-        const username = sessionStorage.getItem("username");
+    const increaseButton =
+        document.getElementById("increaseQuantity");
+    const username = sessionStorage.getItem("username");
 
-        window.location.href = "/" + username + "/home";
+    document.getElementById("cartLink").href =
+        "/" + username + "/cart";
+
+
+    // Decrease quantity
+    decreaseButton.addEventListener("click", function() {
+
+        let quantity = parseInt(quantityInput.value);
+
+        if (quantity > 1) {
+            quantityInput.value = quantity - 1;
+        }
 
     });
+
+
+    // Increase quantity
+    increaseButton.addEventListener("click", function() {
+
+        let quantity = parseInt(quantityInput.value);
+
+        quantityInput.value = quantity + 1;
+
+    });
+
+
+    // Add to cart
+    document.getElementById("addToCart")
+        .addEventListener("click", function() {
+
+            const quantity =
+                parseInt(quantityInput.value);
+
+            const userId =
+                sessionStorage.getItem("userId");
+
+            const cartItem = {
+                userId: userId,
+                productId: productId,
+                quantity: quantity
+            };
+
+            fetch("/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cartItem)
+            })
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error("Failed to add to cart");
+                    }
+
+                    return response.json();
+
+                })
+                .then(data => {
+
+                    document.getElementById("message").textContent =
+                        "Added to cart!";
+
+                })
+                .catch(error => {
+
+                    console.error(error);
+
+                    document.getElementById("message").textContent =
+                        "Could not add item to cart.";
+
+                });
+
+        });
+
+
+    // Back to logged-in user's home page
+    document.getElementById("backToHome")
+        .addEventListener("click", function(event) {
+
+            event.preventDefault();
+
+            const username =
+                sessionStorage.getItem("username");
+
+            window.location.href =
+                "/" + username + "/home";
+
+        });
+    // Back button
+
 
 </script>
 
